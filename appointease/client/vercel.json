@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "buildCommand": "npm run build -- --configuration=production",
+  "outputDirectory": "dist/appointease-client/browser",
+  "installCommand": "npm install",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "framework": "angular"
+}
