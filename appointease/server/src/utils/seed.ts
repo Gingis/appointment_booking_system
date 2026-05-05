@@ -107,7 +107,7 @@ const academicServices = [
 
 async function seed() {
   try {
-    await mongoose.connect(process.env.MONGO_URI as string, { dbName: 'appointease' });
+    await mongoose.connect(process.env.MONGO_URI as string, { dbName: 'schoolbook' });
     console.log('Connected to MongoDB');
 
     // Clear existing
