@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://schoolbook-api.onrender.com/api',
+  apiUrl: 'https://appointment-booking-system-akmq.onrender.com/api',
 };
