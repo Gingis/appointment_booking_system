@@ -10,8 +10,8 @@ const options: swaggerJsdoc.Options = {
       contact: { name: 'SchoolBook Team' },
     },
     servers: [
+      { url: 'https://appointment-booking-system-akmq.onrender.com', description: 'Production' },
       { url: 'http://localhost:3000', description: 'Development' },
-      { url: 'https://schoolbook-api.onrender.com', description: 'Production' },
     ],
     components: {
       securitySchemes: {
