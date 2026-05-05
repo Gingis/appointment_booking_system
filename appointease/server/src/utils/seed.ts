@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
 import { User } from '../models/User';
 import { Service } from '../models/Service';
@@ -120,22 +119,20 @@ async function seed() {
     console.log(`Seeded ${academicServices.length} academic services`);
 
     // Create admin user
-    const adminPassword = await bcrypt.hash('admin123', 12);
     await User.create({
       name: 'System Administrator',
       email: 'admin@isufst.edu.ph',
-      password: adminPassword,
+      password: 'admin123',
       role: 'admin',
       isActive: true,
     });
     console.log('Created admin user: admin@isufst.edu.ph / admin123');
 
     // Create sample student
-    const studentPassword = await bcrypt.hash('student123', 12);
     await User.create({
       name: 'Johnny Jani Yespapang',
       email: 'Johnnyyespapang@isufst.edu.ph',
-      password: studentPassword,
+      password: 'student123',
       role: 'user',
       studentId: '2021-00001',
       course: 'BS Information Technology',
