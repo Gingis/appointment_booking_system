@@ -17,19 +17,28 @@ import { Appointment, AppointmentStatus } from '../../models';
       </div>
 
       <!-- Filters -->
-      <div class="bg-white rounded-2xl border border-slate-200 p-4 mb-6 flex flex-col sm:flex-row gap-3">
-        <select [(ngModel)]="selectedStatus" (ngModelChange)="onFilter()" class="flex-1 px-4 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-          <option value="">All Statuses</option>
-          <option value="pending">Pending</option>
-          <option value="confirmed">Confirmed</option>
-          <option value="completed">Completed</option>
-          <option value="cancelled">Cancelled</option>
-          <option value="rejected">Rejected</option>
-        </select>
-        <input [(ngModel)]="startDate" (ngModelChange)="onFilter()" type="date" placeholder="From"
-          class="flex-1 px-4 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-        <input [(ngModel)]="endDate" (ngModelChange)="onFilter()" type="date" placeholder="To"
-          class="flex-1 px-4 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+      <div class="bg-white rounded-2xl border border-slate-200 p-4 mb-6 flex flex-col sm:flex-row gap-3 items-end">
+        <div class="flex-1 flex flex-col gap-1">
+          <label class="text-xs text-slate-500 font-medium px-1">Status</label>
+          <select [(ngModel)]="selectedStatus" (ngModelChange)="onFilter()" class="px-4 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">All Statuses</option>
+            <option value="pending">Pending</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+        <div class="flex-1 flex flex-col gap-1">
+          <label class="text-xs text-slate-500 font-medium px-1">From</label>
+          <input [(ngModel)]="startDate" (ngModelChange)="onFilter()" type="date"
+            class="px-4 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div class="flex-1 flex flex-col gap-1">
+          <label class="text-xs text-slate-500 font-medium px-1">To</label>
+          <input [(ngModel)]="endDate" (ngModelChange)="onFilter()" type="date"
+            class="px-4 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
       </div>
 
       @if (loading()) {
@@ -108,7 +117,10 @@ export class AppointmentsComponent implements OnInit {
     if (this.endDate) filters.endDate = this.endDate;
     this.apptService.getAppointments(filters).subscribe({
       next: (res) => {
-        if (res.success && res.data) { this.appointments.set(res.data.appointments); this.totalPages.set(res.data.pagination.pages); }
+        if (res.success && res.data) {
+          this.appointments.set(res.data.appointments);
+          this.totalPages.set(res.data.pagination.pages);
+        }
         this.loading.set(false);
       },
       error: () => this.loading.set(false),
@@ -125,7 +137,13 @@ export class AppointmentsComponent implements OnInit {
   }
 
   badge(s: string): string {
-    const m: Record<string, string> = { pending:'bg-yellow-100 text-yellow-700', confirmed:'bg-green-100 text-green-700', completed:'bg-blue-100 text-blue-700', cancelled:'bg-red-100 text-red-700', rejected:'bg-red-100 text-red-700' };
+    const m: Record<string, string> = {
+      pending: 'bg-yellow-100 text-yellow-700',
+      confirmed: 'bg-green-100 text-green-700',
+      completed: 'bg-blue-100 text-blue-700',
+      cancelled: 'bg-red-100 text-red-700',
+      rejected: 'bg-red-100 text-red-700'
+    };
     return m[s] || 'bg-slate-100 text-slate-700';
   }
 }
