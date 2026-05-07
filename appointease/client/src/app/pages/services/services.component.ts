@@ -58,9 +58,18 @@ import { Service } from '../../models';
                 <h3 class="text-lg font-bold text-slate-900 mb-1">{{ service.name }}</h3>
                 <p class="text-slate-500 text-sm flex-1 mb-4 line-clamp-2">{{ service.description }}</p>
                 <div class="flex items-center justify-between pt-3 border-t border-slate-100">
-                  <div>
-                    <span class="text-xl font-bold text-slate-900">₱{{ service.price }}</span>
-                    <span class="text-slate-400 text-xs ml-1">· {{ service.duration }}min</span>
+                  <div class="flex items-center gap-1 text-slate-500">
+                    <svg class="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span class="text-sm font-medium text-slate-600">{{ service.duration }}min</span>
+                    @if (service.duration < 60) {
+                      <span class="text-xs text-slate-400">(under 1hr)</span>
+                    } @else if (service.duration === 60) {
+                      <span class="text-xs text-slate-400">(1hr)</span>
+                    } @else {
+                      <span class="text-xs text-slate-400">({{ service.duration / 60 | number:'1.1-1' }}hr)</span>
+                    }
                   </div>
                   @if (auth.isLoggedIn()) {
                     <a [routerLink]="['/book', service._id]" class="bg-blue-600 text-white px-5 py-2 rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors">Book</a>

@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -5,7 +8,6 @@ import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import mongoSanitize from 'express-mongo-sanitize';
 import swaggerUi from 'swagger-ui-express';
-import dotenv from 'dotenv';
 
 import { connectDB } from './config/database';
 import { swaggerSpec } from './config/swagger';
@@ -17,8 +19,6 @@ import appointmentRoutes from './routes/appointment.routes';
 import serviceRoutes from './routes/service.routes';
 import userRoutes from './routes/user.routes';
 import uploadRoutes from './routes/upload.routes';
-
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;

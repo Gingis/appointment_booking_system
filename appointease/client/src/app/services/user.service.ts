@@ -17,6 +17,11 @@ export class UserService {
     return this.http.get<ApiResponse<{ users: User[]; pagination: any }>>(this.API, { params });
   }
 
+  // ── NEW: update user profile fields ──
+  update(id: string, data: { name?: string; email?: string; phone?: string; studentId?: string; yearLevel?: string; course?: string }): Observable<ApiResponse<{ user: User }>> {
+    return this.http.put<ApiResponse<{ user: User }>>(`${this.API}/${id}`, data);
+  }
+
   updateRole(id: string, role: 'admin' | 'user'): Observable<ApiResponse<{ user: User }>> {
     return this.http.put<ApiResponse<{ user: User }>>(`${this.API}/${id}/role`, { role });
   }

@@ -90,6 +90,11 @@ import { User } from '../../../models';
                     </td>
                     <td class="px-5 py-4">
                       <div class="flex gap-1 flex-wrap">
+                        <!-- EDIT BUTTON (new) -->
+                        <button (click)="openEdit(user)"
+                          class="px-2.5 py-1 bg-blue-50 text-blue-600 rounded-lg text-xs font-medium hover:bg-blue-100 transition-colors">
+                          Edit
+                        </button>
                         <button (click)="toggleRole(user)"
                           class="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-lg text-xs font-medium hover:bg-slate-200 transition-colors">
                           Make {{ user.role === 'admin' ? 'User' : 'Admin' }}
@@ -126,6 +131,82 @@ import { User } from '../../../models';
         }
       }
     </div>
+
+    <!-- ── EDIT MODAL ── -->
+    @if (editingUser()) {
+      <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="closeEdit()"></div>
+
+        <!-- Modal -->
+        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md z-10">
+          <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+            <h2 class="text-lg font-bold text-slate-900">Edit User</h2>
+            <button (click)="closeEdit()" class="text-slate-400 hover:text-slate-600 transition-colors">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="px-6 py-5 space-y-4">
+            @if (editError()) {
+              <div class="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl">{{ editError() }}</div>
+            }
+            @if (editSuccess()) {
+              <div class="bg-green-50 border border-green-200 text-green-700 text-sm px-4 py-3 rounded-xl">User updated successfully.</div>
+            }
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1.5">Full Name</label>
+              <input [(ngModel)]="editForm.name" type="text"
+                class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1.5">Email</label>
+              <input [(ngModel)]="editForm.email" type="email"
+                class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1.5">Phone</label>
+              <input [(ngModel)]="editForm.phone" type="text" placeholder="Optional"
+                class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1.5">Student ID</label>
+                <input [(ngModel)]="editForm.studentId" type="text" placeholder="Optional"
+                  class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1.5">Year Level</label>
+                <input [(ngModel)]="editForm.yearLevel" type="text" placeholder="Optional"
+                  class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1.5">Course</label>
+              <input [(ngModel)]="editForm.course" type="text" placeholder="Optional"
+                class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+          </div>
+
+          <div class="px-6 py-4 border-t border-slate-100 flex gap-3 justify-end">
+            <button (click)="closeEdit()"
+              class="px-5 py-2.5 rounded-xl border border-slate-200 text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors">
+              Cancel
+            </button>
+            <button (click)="saveEdit()" [disabled]="editLoading()"
+              class="px-5 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors flex items-center gap-2">
+              @if (editLoading()) {
+                <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              }
+              {{ editLoading() ? 'Saving...' : 'Save Changes' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    }
   `,
 })
 export class AdminUsersComponent implements OnInit {
@@ -137,6 +218,15 @@ export class AdminUsersComponent implements OnInit {
   search = '';
   roleFilter = '';
   private searchSubject = new Subject<string>();
+
+  // Edit modal state
+  editingUser = signal<User | null>(null);
+  editLoading = signal(false);
+  editError = signal('');
+  editSuccess = signal(false);
+  editForm: { name: string; email: string; phone: string; studentId: string; yearLevel: string; course: string } = {
+    name: '', email: '', phone: '', studentId: '', yearLevel: '', course: ''
+  };
 
   constructor(private userService: UserService) {}
 
@@ -184,5 +274,49 @@ export class AdminUsersComponent implements OnInit {
   deleteUser(id: string): void {
     if (!confirm('Permanently delete this user? This cannot be undone.')) return;
     this.userService.delete(id).subscribe({ next: () => this.load() });
+  }
+
+  // ── Edit modal methods ──
+  openEdit(user: User): void {
+    this.editingUser.set(user);
+    this.editForm = {
+      name: user.name,
+      email: user.email,
+      phone: user.phone ?? '',
+      studentId: user.studentId ?? '',
+      yearLevel: user.yearLevel ?? '',
+      course: user.course ?? '',
+    };
+    this.editError.set('');
+    this.editSuccess.set(false);
+  }
+
+  closeEdit(): void {
+    this.editingUser.set(null);
+    this.editError.set('');
+    this.editSuccess.set(false);
+  }
+
+  saveEdit(): void {
+    const user = this.editingUser();
+    if (!user) return;
+    if (!this.editForm.name.trim() || !this.editForm.email.trim()) {
+      this.editError.set('Name and email are required.');
+      return;
+    }
+    this.editLoading.set(true);
+    this.editError.set('');
+    this.userService.update(user._id, this.editForm).subscribe({
+      next: () => {
+        this.editLoading.set(false);
+        this.editSuccess.set(true);
+        this.load();
+        setTimeout(() => this.closeEdit(), 1200);
+      },
+      error: (err) => {
+        this.editLoading.set(false);
+        this.editError.set(err.error?.message || 'Failed to update user.');
+      },
+    });
   }
 }

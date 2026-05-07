@@ -26,8 +26,19 @@ import { Service } from '../../models';
           <h1 class="text-2xl font-bold mt-1">{{ service()!.name }}</h1>
           <p class="text-blue-100 text-sm mt-1 mb-3">{{ service()!.description }}</p>
           <div class="flex gap-4 text-sm">
-            <span class="bg-white/20 px-3 py-1 rounded-full">₱{{ service()!.price }}</span>
-            <span class="bg-white/20 px-3 py-1 rounded-full">{{ service()!.duration }} minutes</span>
+            <span class="bg-white/20 px-3 py-1 rounded-full flex items-center gap-1">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              {{ service()!.duration }} minutes
+              @if (service()!.duration < 60) {
+                (under 1hr)
+              } @else if (service()!.duration === 60) {
+                (1hr)
+              } @else {
+                ({{ service()!.duration / 60 | number:'1.1-1' }}hr)
+              }
+            </span>
           </div>
         </div>
 
