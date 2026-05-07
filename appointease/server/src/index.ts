@@ -61,6 +61,24 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
   customCss: '.swagger-ui .topbar { background-color: #4f46e5; }',
 }));
 
+// Root route ← NEW
+app.get('/', (_req, res) => {
+  res.json({
+    success: true,
+    message: 'School Appointment Booking System API',
+    version: '1.0.0',
+    docs: '/api-docs',
+    health: '/health',
+    endpoints: {
+      auth: '/api/auth',
+      appointments: '/api/appointments',
+      services: '/api/services',
+      users: '/api/users',
+      upload: '/api/upload',
+    },
+  });
+});
+
 // Health check
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString(), service: 'School Appointment Booking System API' });
